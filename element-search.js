@@ -58,6 +58,10 @@ export class ElementSearch extends LitElement {
         transform: scale(1.1);
         background-color: lightblue; 
       }
+      .searchInput {
+        display: flex;
+        flex-wrap: wrap;
+      }
     `;
   }
 
@@ -72,12 +76,10 @@ export class ElementSearch extends LitElement {
   render() {
     return html`
     <h2>${this.title}</h2>
-    <details open>
-      <summary>Search inputs</summary>
-      <div>
-        <input id="input" placeholder="Search NASA images" @input="${this.inputChanged}" />
+      <div class="searchInput">
+        <input id="input" placeholder="Enter search or web address" @input="${this.inputChanged}" />
+        <button>Analyze</button>
       </div>
-    </details>
     <div class="results">
       ${this.items.map((item, index) => html`
       <a href="${item.links[0].href}" target="_blank" class="container">
