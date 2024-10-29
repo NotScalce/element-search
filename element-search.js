@@ -60,7 +60,18 @@ export class ElementSearch extends LitElement {
       }
       .searchInput {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+      }
+      #input {
+        font-size: 20px;
+        line-height: 40px;
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        display: block;
+      }
+      .analyzeButton {
+        
       }
     `;
   }
@@ -78,7 +89,7 @@ export class ElementSearch extends LitElement {
     <h2>${this.title}</h2>
       <div class="searchInput">
         <input id="input" placeholder="Enter search or web address" @input="${this.inputChanged}" />
-        <button>Analyze</button>
+        <button @click="${this.handleSearch}" class="analyzeButton">Analyze</button>
       </div>
     <div class="results">
       ${this.items.map((item, index) => html`
@@ -92,33 +103,28 @@ export class ElementSearch extends LitElement {
     `;
   }
 
-  inputChanged(e) {
-    this.value = this.shadowRoot.querySelector('#input').value;
-  }
-  // life cycle will run when anything defined in `properties` is modified
-  updated(changedProperties) {
-    // see if value changes from user input and is not empty
-    if (changedProperties.has('value') && this.value) {
+  handleSearch() {
+    if (this.value) {
       this.updateResults(this.value);
     }
-    else if (changedProperties.has('value') && !this.value) {
-      this.items = [];
-    }
-    // @debugging purposes only
-    if (changedProperties.has('items') && this.items.length > 0) {
-      console.log(this.items);
-    }
+  }
+
+  inputChanged(e) {
+    this.value = this.shadowRoot.querySelector('#input').value;
   }
 
   updateResults(value) {
     this.loading = true;
-    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`).then(d => d.ok ? d.json(): {}).then(data => { //change to input search
+    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`).then(d => d.ok ? d.json() : {}).then(data => {
       if (data.collection) {
-        this.items = [];
         this.items = data.collection.items;
-        this.loading = false;
-      }  
+      }
+      this.loading = false;
     });
+  }
+
+  static get tag() {
+    return 'element-search';
   }
 
   static get tag() {
