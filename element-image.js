@@ -6,12 +6,14 @@ export class ElementImage extends LitElement {
       super();
       this.title = '';
       this.source = '';
+      this.description = '';
     }
   
     static get properties() {
       return {
           source: { type: String },
           title: { type: String },
+          description: { type: String },
       };
     }
 
@@ -34,7 +36,10 @@ export class ElementImage extends LitElement {
         width: 200px;
         height: 200px;
         }
-    
+        .description {
+          font-size: 14px;
+          margin-top: 4px;
+        }
         `];
       }
     
@@ -43,6 +48,7 @@ export class ElementImage extends LitElement {
         <div class="image">
             <img src="${this.source}" />
             <div>${this.title}</div>
+            <div class="description">${this.description}</div>
         </div>
         `;
       }

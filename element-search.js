@@ -21,13 +21,16 @@ export class ElementSearch extends LitElement {
         height: 1px;
       }
       .results {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        justify-content: center;
+        align-items: center;
         visibility: visible;
         height: 100%;
         opacity: 1;
-        transition-delay: .5s;
-        transition: .5s all ease-in-out;
+        transition-delay: 0.5s;
+        transition: 0.5s all ease-in-out;
       }
 
       details {
@@ -52,6 +55,10 @@ export class ElementSearch extends LitElement {
         background-color: white; 
         text-decoration: none; 
         margin: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 4px;
       }
       .container:hover {
         margin: 4px;
@@ -59,8 +66,8 @@ export class ElementSearch extends LitElement {
         background-color: lightblue; 
       }
       .searchInput {
+        align-items: center;
         display: flex;
-        flex-wrap: nowrap;
       }
       #input {
         font-size: 20px;
@@ -69,10 +76,28 @@ export class ElementSearch extends LitElement {
         max-width: 500px;
         margin: 0 auto;
         display: block;
+        border-radius: 8px;
       }
-      .analyzeButton {
-        
-      }
+      
+      .analyzeButton {background-image: linear-gradient(to right, #2b5876 0%, #4e4376  51%, #2b5876  100%)}
+         .analyzeButton {
+            margin: 20px;
+            padding: 15px 45px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;            
+            box-shadow: 0 0 20px #eee;
+            border-radius: 10px;
+            display: block;
+          }
+          .analyzeButton:hover {
+            background-position: right center; /* change the direction of the change here */
+            color: #fff;
+            text-decoration: none;
+          }
+         
     `;
   }
 
@@ -97,6 +122,7 @@ export class ElementSearch extends LitElement {
         <element-image
           source="${item.links[0].href}"
           title="${item.data[0].title}"
+          description="${item.data[0].description}"
         ></element-image></a>
       `)}
     </div>
@@ -115,12 +141,14 @@ export class ElementSearch extends LitElement {
 
   updateResults(value) {
     this.loading = true;
-    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`).then(d => d.ok ? d.json() : {}).then(data => {
-      if (data.collection) {
-        this.items = data.collection.items;
-      }
-      this.loading = false;
-    });
+    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`)
+      .then(d => d.ok ? d.json() : {})
+      .then(data => {
+        if (data.collection) {
+          this.items = data.collection.items.slice(0, 6);
+        }
+        this.loading = false;
+      });
   }
 
   static get tag() {
