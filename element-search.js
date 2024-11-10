@@ -7,6 +7,7 @@ export class ElementSearch extends LitElement {
       loading: { type: Boolean, reflect: true },
       items: { type: Array, },
       value: { type: String },
+      jsonUrl: { type: String }
     };
   }
 
@@ -50,7 +51,7 @@ export class ElementSearch extends LitElement {
         width: 100%;
       }
       .container {
-        overflow: hidden;
+        overflow: scroll;
         transition: transform 0.3s ease, background-color 0.3s ease;
         background-color: white; 
         text-decoration: none; 
@@ -107,9 +108,13 @@ export class ElementSearch extends LitElement {
     this.title = '';
     this.loading = false;
     this.items = [];
+    this.jsonUrl = '';
   }
 
   render() {
+    if(this.url == ''){this.url = 'https://haxtheweb.org/site.json';}
+    else if (!this.url || !this.url.endsWith('site.json')) {this.url+='site.json';}
+
     return html`
     <h2>${this.title}</h2>
       <div class="searchInput">
@@ -141,7 +146,7 @@ export class ElementSearch extends LitElement {
 
   updateResults(value) {
     this.loading = true;
-    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`)
+    fetch(`https://haxtheweb.org${value}`)
       .then(d => d.ok ? d.json() : {})
       .then(data => {
         if (data.collection) {
