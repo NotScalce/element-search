@@ -146,13 +146,12 @@ export class ElementSearch extends LitElement {
 
   updateResults(value) {
     this.loading = true;
-    fetch(`https://haxtheweb.org${value}`)
-      .then(d => d.ok ? d.json() : {})
-      .then(data => {
-        if (data.collection) {
-          this.items = data.collection.items.slice(0, 6);
-        }
+    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`).then(d => d.ok ? d.json(): {}).then(data => {
+      if (data.collection) {
+        this.items = [];
+        this.items = data.collection.items;
         this.loading = false;
+      }
       });
   }
 
@@ -160,8 +159,5 @@ export class ElementSearch extends LitElement {
     return 'element-search';
   }
 
-  static get tag() {
-    return 'element-search';
-  }
 }
 globalThis.customElements.define(ElementSearch.tag, ElementSearch);
