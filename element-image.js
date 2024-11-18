@@ -5,15 +5,19 @@ export class ElementImage extends LitElement {
     constructor() {
       super();
       this.title = '';
-      this.source = '';
+      this.imageSrc = '';
       this.description = '';
     }
   
     static get properties() {
       return {
-          source: { type: String },
-          title: { type: String },
-          description: { type: String },
+        imageSrc: { type: String, Reflect: true },
+        title: { type: String },
+        description: { type: String },
+        dateUpdated: { type: String },
+        pageLink: { type: String },
+        pageHtml: { type: String },
+        readTime: { type: String },
       };
     }
 
@@ -45,11 +49,19 @@ export class ElementImage extends LitElement {
     
       render() {
         return html`
-        <div class="image">
-            <img src="${this.source}" />
+          <div class="image">
+            <img src="${this.item}" alt="${this.title}" />
             <div>${this.title}</div>
             <div class="description">${this.description}</div>
-        </div>
+            ${this.dateUpdated
+              ? html`<div class="date">Updated: ${this.dateUpdated}</div>`
+              : ""}
+            ${this.readTime
+              ? html`<div class="read-time">Read Time: ${this.readTime}</div>`
+              : ""}
+            <a href="${this.pageLink}" target="_blank">View Page</a>
+            <a href="${this.pageHtml}" target="_blank">View HTML</a>
+          </div>
         `;
       }
       static get tag() {

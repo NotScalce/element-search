@@ -1,13 +1,16 @@
 import { LitElement, html, css } from 'lit';
 import "./element-image.js";
+import { ifDefined } from 'lit/directives/if-defined.js';
 export class ElementSearch extends LitElement {
+
+
   static get properties() {
     return {
       title: { type: String },
       loading: { type: Boolean, reflect: true },
       items: { type: Array, },
       value: { type: String },
-      jsonUrl: { type: String }
+      url: { type: String }
     };
   }
 
@@ -104,16 +107,34 @@ export class ElementSearch extends LitElement {
 
   constructor() {
     super();
-    this.value = null;
+    this.value = " ";
     this.title = '';
     this.loading = false;
     this.items = [];
-    this.jsonUrl = '';
+    this.url = '';
+  }
+
+  getImgSrc(item) {
+    const baseUrl = this.url.endsWith("/") ? this.url : `${this.url}/`;
+  
+    if (item.files && item.files.length > 0) {
+      const imageFile = item.files.find(file => file.type === "image");
+      if (imageFile && imageFile.fullUrl) {
+        return `${baseUrl}${imageFile.fullUrl.replace(/^\//, '')}`;
+      }
+    }
+    return item.imageUrl ? item.imageUrl : "https://via.placeholder.com/200";
+  }
+
+  dateToString(date) {
+    if (!date) return '';
+    const parsedDate = new Date(date);
+    return parsedDate.toLocaleDateString();
   }
 
   render() {
-    if(this.url == ''){this.url = 'https://haxtheweb.org/site.json';}
-    else if (!this.url || !this.url.endsWith('site.json')) {this.url+='site.json';}
+    if(this.value == ''){this.value = 'https://haxtheweb.org/site.json';}
+    else if (!this.value || !this.value.endsWith('site.json')) {this.value+='site.json';}
 
     return html`
     <h2>${this.title}</h2>
@@ -123,33 +144,37 @@ export class ElementSearch extends LitElement {
       </div>
     <div class="results">
       ${this.items.map((item, index) => html`
-      <a href="${item.links[0].href}" target="_blank" class="container">
+        <a href='${this.value}${item.slug}' target="_blank" class="container">
         <element-image
-          source="${item.links[0].href}"
-          title="${item.data[0].title}"
-          description="${item.data[0].description}"
+          title="${item.title}"
+          description="${item.description}"
+          imageSrc='${ifDefined(this.getImgSrc(item))}' 
+          dateUpdated='${this.dateToString(item.metadata.updated)}'
+          pageLink='${this.value}${item.slug}'
+          pageHtml='${this.value}${item.location}'
+          readTime='${item.metadata.readTime}'
         ></element-image></a>
       `)}
     </div>
     `;
   }
 
+  // For image source put url + fullUrl
+
   handleSearch() {
+    this.value = this.shadowRoot.querySelector('#input').value;
     if (this.value) {
       this.updateResults(this.value);
     }
   }
 
-  inputChanged(e) {
-    this.value = this.shadowRoot.querySelector('#input').value;
-  }
-
   updateResults(value) {
     this.loading = true;
-    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`).then(d => d.ok ? d.json(): {}).then(data => {
-      if (data.collection) {
+    fetch(`${this.value}`).then(d => d.ok ? d.json(): {}).then(data => {
+      if (data) {
+        console.log(data)
         this.items = [];
-        this.items = data.collection.items;
+        this.items = data.items;
         this.loading = false;
       }
       });
